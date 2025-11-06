@@ -1,0 +1,30 @@
+syntax = "proto3";
+package api_design;
+
+
+message Player{
+  string name = 1;
+  int32 id = 2;
+  float health = 3;
+  PlayerType type = 4;
+  enum PlayerType{
+    Melee = 0;
+    Archer = 1;
+    Mage = 2;
+  }
+  
+  message Item{
+    string itemName = 1;
+  }
+  
+  repeated Item items = 5;
+}
+
+
+message PlayerQuery{
+  int32 playerId = 1;
+}
+
+service PlayerManager{
+  rpc GetPlayer(PlayerQuery) returns (Player);
+}

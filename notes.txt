@@ -1,0 +1,37 @@
+﻿mergeFromString => Parses a json string to protobuf message.
+
+
+
+
+serializing the message to a json string plan.
+ 1- all messages definintions in a map, maping each message name to a message definition written maybe in a json string idk.
+ 2- marking each field either repeated or required, also writing its type.
+ 3- writing each service definition, each maps to a list of methods, each method is a input type, output type
+ 4- wirint all enum definitons as well, incase needed
+    (3 and 4 remaining for later [kinda easy though])
+
+
+next, figure the hell out how would you send a request to a grpc server using json.
+
+
+
+
+encoding stuff:
+ => (field number << 3) | wire type : the first 3 bits tells us the wire type and the rest the field number
+
+
+zigZag encoding:
+    (n << 1) ^ (n >> 31)
+zigZag decoding:
+    (n >>> 1) ^ -(n & 1)
+
+
+how variants encoding works ?
+ split into 7 bits chuncks, padding is required in this case
+ add MSB if there is more bytes to come
+ take them as little endian
+ encode into hex
+
+0000100 1110000
+11110000 00000100
+F0 04

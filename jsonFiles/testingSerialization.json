@@ -1,0 +1,53 @@
+{
+  "fileName": "ProtoBuf_files/api_design.proto",
+  "imports": [],
+  "messages": {
+    "Player": {
+      "Player": [
+        {
+          "fieldName": "name",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "id",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "health",
+          "fieldType": "ProtoType.TYPE_FLOAT",
+          "fieldLabel": "LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "type",
+          "fieldType": ".api_design.Player.PlayerType",
+          "fieldLabel": "LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "items",
+          "fieldType": ".api_design.Player.Item",
+          "fieldLabel": "LABEL_REPEATED"
+        }
+      ]
+    },
+    "Item": {
+      "Item": [
+        {
+          "fieldName": "itemName",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "PlayerQuery": {
+      "PlayerQuery": [
+        {
+          "fieldName": "playerId",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "LABEL_OPTIONAL"
+        }
+      ]
+    }
+  }
+}

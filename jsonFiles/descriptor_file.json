@@ -1,0 +1,31 @@
+﻿{
+  "syntax": "proto3",
+  "package": "foo.bar",
+  "options": {
+    "go_package": "github.com/foo/bar",
+    "java_package": "com.foo.bar"
+  },
+  "message": [
+    {
+      "name": "Foo",
+      "options": { "deprecated": true },
+      "field": [
+        { "name": "name", "number": 1, "type": "TYPE_STRING", "label": "LABEL_OPTIONAL" },
+        {
+          "name": "class_ids",
+          "number": 2,
+          "type": "TYPE_STRING",
+          "label": "LABEL_REPEATED",
+          "options": { "packed": true }
+        },
+        {
+          "name": "ssn",
+          "number": 3,
+          "type": "TYPE_STRING",
+          "label": "LABEL_OPTIONAL",
+          "options": { "debug_redact": true }
+        }
+      ]
+    }
+  ]
+}
