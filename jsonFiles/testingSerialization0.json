@@ -1,0 +1,298 @@
+{
+  "fileName": "ProtoBuf_files/game_server_definition.proto",
+  "imports": [],
+  "messages": {
+    "Player": {
+      "Player": [
+        {
+          "fieldName": "id",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "name",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "health",
+          "fieldType": "ProtoType.TYPE_FLOAT",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "type",
+          "fieldType": "ProtoType.TYPE_ENUM",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "items",
+          "fieldType": "ProtoType.TYPE_MESSAGE",
+          "fieldLabel": "ProtoLabel.LABEL_REPEATED"
+        },
+        {
+          "fieldName": "level",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "experience",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "attributes",
+          "fieldType": "ProtoType.TYPE_MESSAGE",
+          "fieldLabel": "ProtoLabel.LABEL_REPEATED"
+        }
+      ]
+    },
+    "Item": {
+      "Item": [
+        {
+          "fieldName": "itemName",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "quantity",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "rarity",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "AttributesEntry": {
+      "AttributesEntry": [
+        {
+          "fieldName": "key",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "value",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "PlayerQuery": {
+      "PlayerQuery": [
+        {
+          "fieldName": "playerId",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "PlayerListRequest": {
+      "PlayerListRequest": [
+        {
+          "fieldName": "ids",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_REPEATED"
+        }
+      ]
+    },
+    "PlayerListResponse": {
+      "PlayerListResponse": [
+        {
+          "fieldName": "players",
+          "fieldType": "ProtoType.TYPE_MESSAGE",
+          "fieldLabel": "ProtoLabel.LABEL_REPEATED"
+        }
+      ]
+    },
+    "PlayerSearchFilter": {
+      "PlayerSearchFilter": [
+        {
+          "fieldName": "nameContains",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "type",
+          "fieldType": "ProtoType.TYPE_ENUM",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "minHealth",
+          "fieldType": "ProtoType.TYPE_FLOAT",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "maxHealth",
+          "fieldType": "ProtoType.TYPE_FLOAT",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "minLevel",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "maxLevel",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "PlayerSearchResponse": {
+      "PlayerSearchResponse": [
+        {
+          "fieldName": "results",
+          "fieldType": "ProtoType.TYPE_MESSAGE",
+          "fieldLabel": "ProtoLabel.LABEL_REPEATED"
+        },
+        {
+          "fieldName": "totalFound",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "UpdatePlayerRequest": {
+      "UpdatePlayerRequest": [
+        {
+          "fieldName": "playerId",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "newName",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "newHealth",
+          "fieldType": "ProtoType.TYPE_FLOAT",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "updatedAttributes",
+          "fieldType": "ProtoType.TYPE_MESSAGE",
+          "fieldLabel": "ProtoLabel.LABEL_REPEATED"
+        },
+        {
+          "fieldName": "newItems",
+          "fieldType": "ProtoType.TYPE_MESSAGE",
+          "fieldLabel": "ProtoLabel.LABEL_REPEATED"
+        }
+      ]
+    },
+    "UpdatedAttributesEntry": {
+      "UpdatedAttributesEntry": [
+        {
+          "fieldName": "key",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "value",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "UpdatePlayerResponse": {
+      "UpdatePlayerResponse": [
+        {
+          "fieldName": "updatedPlayer",
+          "fieldType": "ProtoType.TYPE_MESSAGE",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "message",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "DeletePlayerRequest": {
+      "DeletePlayerRequest": [
+        {
+          "fieldName": "playerId",
+          "fieldType": "ProtoType.TYPE_INT32",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "DeletePlayerResponse": {
+      "DeletePlayerResponse": [
+        {
+          "fieldName": "success",
+          "fieldType": "ProtoType.TYPE_BOOL",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "message",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "CreatePlayerRequest": {
+      "CreatePlayerRequest": [
+        {
+          "fieldName": "name",
+          "fieldType": "ProtoType.TYPE_STRING",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        },
+        {
+          "fieldName": "type",
+          "fieldType": "ProtoType.TYPE_ENUM",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    },
+    "CreatePlayerResponse": {
+      "CreatePlayerResponse": [
+        {
+          "fieldName": "createdPlayer",
+          "fieldType": "ProtoType.TYPE_MESSAGE",
+          "fieldLabel": "ProtoLabel.LABEL_OPTIONAL"
+        }
+      ]
+    }
+  },
+  "services": {
+    "GamePlayerManager": {
+      "name": "GamePlayerManager",
+      "methods": [
+        {
+          "name": "GetPlayer",
+          "inputTypes": ".api_design.PlayerQuery",
+          "outputTypes": ".api_design.Player"
+        },
+        {
+          "name": "GetPlayers",
+          "inputTypes": ".api_design.PlayerListRequest",
+          "outputTypes": ".api_design.PlayerListResponse"
+        },
+        {
+          "name": "SearchPlayers",
+          "inputTypes": ".api_design.PlayerSearchFilter",
+          "outputTypes": ".api_design.PlayerSearchResponse"
+        },
+        {
+          "name": "CreatePlayer",
+          "inputTypes": ".api_design.CreatePlayerRequest",
+          "outputTypes": ".api_design.CreatePlayerResponse"
+        },
+        {
+          "name": "UpdatePlayer",
+          "inputTypes": ".api_design.UpdatePlayerRequest",
+          "outputTypes": ".api_design.UpdatePlayerResponse"
+        },
+        {
+          "name": "DeletePlayer",
+          "inputTypes": ".api_design.DeletePlayerRequest",
+          "outputTypes": ".api_design.DeletePlayerResponse"
+        }
+      ]
+    }
+  }
+}

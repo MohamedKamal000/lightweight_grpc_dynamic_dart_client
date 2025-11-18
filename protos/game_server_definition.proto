@@ -1,0 +1,114 @@
+﻿syntax = "proto3";
+package api_design;
+
+// ---------------------------
+// Player Model
+// ---------------------------
+
+message Player {
+  int32 id = 1;
+  string name = 2;
+  float health = 3;
+
+  enum PlayerType {
+    Melee = 0;
+    Archer = 1;
+    Mage = 2;
+  }
+  PlayerType type = 4;
+
+  message Item {
+    string itemName = 1;
+    int32 quantity = 2;
+    int32 rarity = 3;
+  }
+  repeated Item items = 5;
+
+  int32 level = 6;
+  int32 experience = 7;
+
+  map<string, int32> attributes = 8; // e.g., "strength":10, "agility":8
+}
+
+// ---------------------------
+// Requests / Responses
+// ---------------------------
+
+message PlayerQuery {
+  int32 playerId = 1;
+}
+
+message PlayerListRequest {
+  repeated int32 ids = 1;
+}
+
+message PlayerListResponse {
+  repeated Player players = 1;
+}
+
+message PlayerSearchFilter {
+  string nameContains = 1;
+  Player.PlayerType type = 2;
+  float minHealth = 3;
+  float maxHealth = 4;
+  int32 minLevel = 5;
+  int32 maxLevel = 6;
+}
+
+message PlayerSearchResponse {
+  repeated Player results = 1;
+  int32 totalFound = 2;
+}
+
+message UpdatePlayerRequest {
+  int32 playerId = 1;
+  string newName = 2;
+  float newHealth = 3;
+
+  map<string, int32> updatedAttributes = 4;
+
+  repeated Player.Item newItems = 5;
+}
+
+message UpdatePlayerResponse {
+  Player updatedPlayer = 1;
+  string message = 2;
+}
+
+message DeletePlayerRequest {
+  int32 playerId = 1;
+}
+
+message DeletePlayerResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message CreatePlayerRequest {
+  string name = 1;
+  Player.PlayerType type = 2;
+}
+
+message CreatePlayerResponse {
+  Player createdPlayer = 1;
+}
+
+// ---------------------------
+// Service
+// ---------------------------
+
+service PlayerManager {
+
+  // Basic
+  rpc GetPlayer(PlayerQuery) returns (Player);
+  rpc GetPlayers(PlayerListRequest) returns (PlayerListResponse);
+
+  // More complex
+  rpc SearchPlayers(PlayerSearchFilter) returns (PlayerSearchResponse);
+
+  rpc CreatePlayer(CreatePlayerRequest) returns (CreatePlayerResponse);
+
+  rpc UpdatePlayer(UpdatePlayerRequest) returns (UpdatePlayerResponse);
+
+  rpc DeletePlayer(DeletePlayerRequest) returns (DeletePlayerResponse);
+}

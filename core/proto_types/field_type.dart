@@ -8,9 +8,9 @@ class ProtoField implements ProtoJsonSerializationInterface{
   final String fieldName;
   final ProtoType fieldType;
   final ProtoLabel fieldLabel;
-  final String? typeName;
+  final String? typeName; // in case of TYPE_MESSAGE or TYPE_ENUM
   final bool isDataSet;
-  final dynamic data;
+  final dynamic data; // in case treating field as a data holder
   final dynamic listOfData_if_repeated;
 
   const ProtoField({
@@ -37,8 +37,8 @@ class ProtoField implements ProtoJsonSerializationInterface{
   Map<String,dynamic> toJson() {
     return {
       'fieldName': fieldName,
-      'fieldType': fieldType,
-      'fieldLabel': fieldLabel,
+      'fieldType': fieldType.toString(),
+      'fieldLabel': fieldLabel.toString(),
     };
   }
 

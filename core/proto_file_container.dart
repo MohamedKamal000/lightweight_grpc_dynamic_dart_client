@@ -1,15 +1,27 @@
 ﻿import 'proto_types/message_type.dart';
 import 'proto_types/proto_json_serialization_interface.dart';
+import 'proto_types/service_type.dart';
 
 class ProtoFileContainer implements ProtoJsonSerializationInterface {
   final String fileName;
   late Map<String, ProtoMessage>? messages;
-  late List<String> ?imports;
+  late List<String>? imports;
+  late Map<String, ServiceType>?
+  services; // we need services too here (will act as a way to lookup services a server expose)
 
-  ProtoFileContainer({required this.fileName, this.messages,this.imports});
+  ProtoFileContainer({
+    required this.fileName,
+    this.messages,
+    this.imports,
+    this.services,
+  });
 
   void SetMessages(Map<String, ProtoMessage> msgs) {
     messages = msgs;
+  }
+
+  void SetServices(Map<String, ServiceType> services) {
+    this.services = services;
   }
 
   @override
@@ -25,7 +37,8 @@ class ProtoFileContainer implements ProtoJsonSerializationInterface {
       buffer.writeln('(No messages)');
     } else {
       buffer.writeln(
-          messages!.values.map((m) => m.toString()).join('\n=========\n'));
+        messages!.values.map((m) => m.toString()).join('\n=========\n'),
+      );
     }
 
     return buffer.toString();
@@ -37,6 +50,7 @@ class ProtoFileContainer implements ProtoJsonSerializationInterface {
       'fileName': fileName,
       'imports': imports,
       'messages': messages?.map((key, value) => MapEntry(key, value.toJson())),
+      'services': services?.map((k,v) => MapEntry(k, v.toJson())),
     };
   }
 }

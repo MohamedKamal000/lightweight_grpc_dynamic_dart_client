@@ -1,37 +1,67 @@
-﻿import 'dart:convert';
-import 'dart:io';
-import '../proto_descriptor/descriptor.pb.dart';
+﻿import '../proto_descriptor/descriptor.pb.dart';
 import 'proto_file_container.dart';
 import 'proto_types.dart';
 import 'proto_types/field_type.dart';
 import 'proto_types/message_type.dart';
+import 'proto_types/method_type.dart';
+import 'proto_types/service_type.dart';
 
 void SerializeProtoFiles(List<FileDescriptorProto> fileDescriptors) {
   List<ProtoFileContainer> containers = [];
   for (final file in fileDescriptors) {
     final messagesMap = ConstructMessages(file.messageType, {});
-    containers.add(ProtoFileContainer(fileName: file.name,messages: messagesMap,imports: file.dependency));
+    containers.add(
+      ProtoFileContainer(
+        fileName: file.name,
+        messages: messagesMap,
+        imports: file.dependency,
+      ),
+    );
   }
 
   print(containers);
 }
 
-
-void SerializeProtoFile(FileDescriptorProto fileDescriptors) {
-  List<ProtoFileContainer> containers = [];
+ProtoFileContainer ConstructProtoFileContainer(FileDescriptorProto fileDescriptors) {
   final messagesMap = ConstructMessages(fileDescriptors.messageType, {});
-  containers.add(ProtoFileContainer(fileName: fileDescriptors.name,messages: messagesMap,imports: fileDescriptors.dependency));
+  final services = ConstructServices(fileDescriptors.service);
+  ProtoFileContainer container = ProtoFileContainer(
+    fileName: fileDescriptors.name,
+    messages: messagesMap,
+    imports: fileDescriptors.dependency,
+    services: {
+      for (var service in services) service.name: service,
+    },
+  );
 
-  for (final container in containers) {
-    print(container.toString());
-    print('===================');
-    print(jsonEncode(container.toJson()));
-    File('./jsonFiles/testingSerialization.json').writeAsString(jsonEncode(container.toJson()));
-  }
+  return container;
 }
 
+List<ServiceType> ConstructServices(
+  List<ServiceDescriptorProto> serviceDescriptors,
+) {
+  List<ServiceType> services = [];
+  for (final service in serviceDescriptors) {
+    final serviceType = ServiceType(name: service.name, methods: {});
+    for (final method in service.method) {
 
-Map<String,ProtoMessage> ConstructMessages(List<DescriptorProto> messageDescriptors,Map<String,ProtoMessage> messageMap) {
+      serviceType.methods[method.name] = MethodType(
+        methodName: method.name,
+        inputType: method.inputType.split('.').last,
+        outputType: method.inputType.split('.').last,
+        clientStreaming: method.clientStreaming,
+        serverStreaming: method.serverStreaming,
+      );
+    }
+    services.add(serviceType);
+  }
+  return services;
+}
+
+Map<String, ProtoMessage> ConstructMessages(
+  List<DescriptorProto> messageDescriptors,
+  Map<String, ProtoMessage> messageMap,
+) {
   for (final msg in messageDescriptors) {
     final protoMessage = ProtoMessage(msg.name, fields: []);
     for (final field in msg.field) {

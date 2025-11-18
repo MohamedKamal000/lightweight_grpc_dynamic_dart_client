@@ -1,0 +1,10 @@
+﻿
+
+
+
+Some Refactors and things to do:
+ [] seperate data storing from fields representation
+ [] Decoding responses
+ [] more validation in some places
+ [] relying on proto files importing
+ [] dealing with multiple proto files imports, where there might be some type in a different file u might retrieve
