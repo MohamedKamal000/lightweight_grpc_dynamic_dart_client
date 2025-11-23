@@ -19,18 +19,27 @@ class ReflectionClient {
     _stub = ServerReflectionClient(clientChannel);
   }
 
-
-
-  /// List all services on the server using reflection.
-  Stream<ServerReflectionResponse> getServicesStream() {
+  Future<ServerReflectionResponse> listServices() async {
     final responseStream = _stub.serverReflectionInfo(
       Stream.fromIterable([
-        ServerReflectionRequest(fileContainingSymbol: 'api_design.GamePlayerManager')
+        ServerReflectionRequest(listServices: '')
+      ]),
+    );
+
+    return await responseStream.single;
+  }
+
+  Stream<ServerReflectionResponse> getServiceStream(String serviceName) {
+    final responseStream = _stub.serverReflectionInfo(
+      Stream.fromIterable([
+        ServerReflectionRequest(fileContainingSymbol: serviceName)
       ]),
     );
 
     return responseStream;
   }
+
+
 
   Future<void> close() async {
     await clientChannel.shutdown();

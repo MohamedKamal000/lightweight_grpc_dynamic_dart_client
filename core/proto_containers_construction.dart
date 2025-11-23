@@ -6,29 +6,23 @@ import 'proto_types/message_type.dart';
 import 'proto_types/method_type.dart';
 import 'proto_types/service_type.dart';
 
-void SerializeProtoFiles(List<FileDescriptorProto> fileDescriptors) {
-  List<ProtoFileContainer> containers = [];
+Map<String,ProtoFileContainer> ConstructProtoFileContainers(List<FileDescriptorProto> fileDescriptors) {
+  Map<String,ProtoFileContainer> containers = {};
   for (final file in fileDescriptors) {
-    final messagesMap = ConstructMessages(file.messageType, {});
-    containers.add(
-      ProtoFileContainer(
-        fileName: file.name,
-        messages: messagesMap,
-        imports: file.dependency,
-      ),
-    );
+    containers[file.package] = ConstructProtoFileContainer(file);
   }
 
-  print(containers);
+  return containers;
 }
 
-ProtoFileContainer ConstructProtoFileContainer(FileDescriptorProto fileDescriptors) {
-  final messagesMap = ConstructMessages(fileDescriptors.messageType, {});
-  final services = ConstructServices(fileDescriptors.service);
+ProtoFileContainer ConstructProtoFileContainer(FileDescriptorProto fileDescriptor) {
+  final messagesMap = ConstructMessages(fileDescriptor.messageType, {}, fileDescriptor.package.isEmpty ? '' : fileDescriptor.package);
+  final services = ConstructServices(fileDescriptor.service, fileDescriptor.package.isEmpty ? '' : fileDescriptor.package);
   ProtoFileContainer container = ProtoFileContainer(
-    fileName: fileDescriptors.name,
+    package: fileDescriptor.package,
+    fileName: fileDescriptor.name,
     messages: messagesMap,
-    imports: fileDescriptors.dependency,
+    imports: fileDescriptor.dependency,
     services: {
       for (var service in services) service.name: service,
     },
@@ -39,16 +33,20 @@ ProtoFileContainer ConstructProtoFileContainer(FileDescriptorProto fileDescripto
 
 List<ServiceType> ConstructServices(
   List<ServiceDescriptorProto> serviceDescriptors,
+  String packageName,
 ) {
   List<ServiceType> services = [];
   for (final service in serviceDescriptors) {
-    final serviceType = ServiceType(name: service.name, methods: {});
-    for (final method in service.method) {
+    final serviceName = packageName.isNotEmpty
+        ? '$packageName.${service.name}'
+        : service.name;
 
+    final serviceType = ServiceType(name: serviceName, methods: {});
+    for (final method in service.method) {
       serviceType.methods[method.name] = MethodType(
         methodName: method.name,
-        inputType: method.inputType.split('.').last,
-        outputType: method.inputType.split('.').last,
+        inputType: method.inputType.replaceFirst('.', ''),
+        outputType: method.outputType.replaceFirst('.', ''),
         clientStreaming: method.clientStreaming,
         serverStreaming: method.serverStreaming,
       );
@@ -61,9 +59,12 @@ List<ServiceType> ConstructServices(
 Map<String, ProtoMessage> ConstructMessages(
   List<DescriptorProto> messageDescriptors,
   Map<String, ProtoMessage> messageMap,
+    String prefixDefinition ,
 ) {
+
   for (final msg in messageDescriptors) {
-    final protoMessage = ProtoMessage(msg.name, fields: []);
+    final messageName = prefixDefinition.isNotEmpty ? '$prefixDefinition.${msg.name}' : msg.name;
+    final protoMessage = ProtoMessage(messageName, fields: [],isMapEntry: msg.options.mapEntry);
     for (final field in msg.field) {
       final fieldType = ProtoType.fromValue_toProtoType(field.type.value);
       final protoField = ProtoField(
@@ -77,12 +78,16 @@ Map<String, ProtoMessage> ConstructMessages(
       protoMessage.AddField(protoField);
     }
 
-    messageMap[msg.name!] = protoMessage;
+    messageMap[messageName] = protoMessage;
 
     if (msg.nestedType.isNotEmpty) {
-      ConstructMessages(msg.nestedType, messageMap);
+      ConstructMessages(msg.nestedType, messageMap, messageName);
     }
   }
 
   return messageMap;
 }
+
+
+
+

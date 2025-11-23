@@ -1,4 +1,11 @@
-﻿import '../proto_descriptor/descriptor.pb.dart';
+﻿import 'dart:convert';
+import 'dart:io';
+
+import 'package:grpc/grpc.dart';
+
+import '../grpc_request_sender.dart';
+import '../main.dart';
+import '../proto_descriptor/descriptor.pb.dart';
 import 'grpc_request.dart';
 import 'proto_file_container.dart';
 import 'proto_types.dart';
@@ -129,12 +136,10 @@ String TrySendMessageAsRequest() {
 
 void TestMessageDesirialization(ProtoFileContainer container) {
   GrpcRequest request = GrpcRequest.fromJson({
-    'service': 'GamePlayerManager',
-    'method': 'GetPlayers',
     'data': {
       'ids': '[1, 2, 3, 4, 5]',
     },
-  }, container);
+  }, container, 'GamePlayerManager', 'GetPlayers');
 
   print('Deserialized GrpcRequest:');
   print('Service: ${request.service}');
@@ -142,6 +147,48 @@ void TestMessageDesirialization(ProtoFileContainer container) {
   print('Message Fields:');
   for (var field in request.message!.fields) {
     print('Field Name: ${field.fieldName}, Field Value: ${field.data}');
+  }
+
+}
+
+Future MethodCall(ProtoFileContainer protoFileContainer,String serviceToRequest,String method,String FilePath) async {
+
+  Map<String,dynamic> quickJsonFileDecoder(String jsonFileName){
+    String content = File(jsonFileName).readAsStringSync();
+    return jsonDecode(content);
+  }
+
+  Map<String, dynamic> jsonRequest = {
+    'data': quickJsonFileDecoder(FilePath)
+  };
+
+  GrpcRequest grpcRequest = GrpcRequest.fromJson(jsonRequest, protoFileContainer,serviceToRequest, method);
+  DynamicGrpcClient dynamicGrpcClient = DynamicGrpcClient(
+    ClientChannel(
+      'localhost',
+      port: 50051,
+      options: ChannelOptions(credentials: ChannelCredentials.insecure()),
+    ),
+  );
+
+  await dynamicGrpcClient.MakeCall(grpcRequest);
+}
+
+void FullMethodsTest(ProtoFileContainer container,String serviceName) async {
+  String basePath = 'jsonFiles/request_tests';
+  List<List<String>> methods = [
+    ["CreatePlayer",'$basePath/create_player.json'],
+    /*["GetPlayer", '$basePath/get_player.json'],
+    ["UpdatePlayer", '$basePath/update_player.json'],
+    ["DeletePlayer", '$basePath/delete_player.json'],
+    ["GetPlayers", '$basePath/get_players.json'],
+    ['SearchPlayers', '$basePath/search_players.json']*/
+  ];
+
+  for (var method in methods) {
+    print('--- Testing Method: ${method[0]} ---');
+    await MethodCall(container, serviceName, method[0], method[1]);
+    print('--- Finished Method: ${method[0]} ---\n');
   }
 
 }

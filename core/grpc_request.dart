@@ -15,28 +15,17 @@ class GrpcRequest {
   });
 
   factory GrpcRequest.fromJson(Map<String, dynamic> json,
-      ProtoFileContainer protoFileContainer) {
-    if (json['service'] != null &&
-        protoFileContainer.services != null &&
-        !protoFileContainer.services!.containsKey(json['service'])) {
+      ProtoFileContainer protoFileContainer,String service, String methodName) {
+    if (protoFileContainer.services != null && !protoFileContainer.services!.containsKey(service)) {
       throw Exception('Service not found in proto file container');
     }
 
-    String serviceName = json['service'];
-
-    if (json['method'] != null &&
-        !protoFileContainer
-            .services![serviceName]!.methods
-            .containsKey(json['method'])) {
-      throw Exception('Method not found in service $serviceName');
+    if (!protoFileContainer.services![service]!.methods.containsKey(methodName)) {
+      throw Exception('Method not found in service $service');
     }
 
-    String methodName = json['method'];
-    MethodType method = protoFileContainer
-        .services![serviceName]!.methods[methodName]!;
-
-
-    String inputTypeName = method.inputType; // message as Input type
+    MethodType methodType = protoFileContainer.services![service]!.methods[methodName]!;
+    String inputTypeName = methodType.inputType; // message as Input type
 
     dynamic dataSent = json['data']; // incoming data
 
@@ -46,9 +35,10 @@ class GrpcRequest {
     DeserializeJsonToMessage deserializer = DeserializeJsonToMessage(
       data: dataSent,
       messageStructure: messageStructure,
+      container: protoFileContainer,
     );
     return GrpcRequest(
-      service: serviceName,
+      service: service,
       method: methodName,
       message: deserializer.Deserialize()
     );

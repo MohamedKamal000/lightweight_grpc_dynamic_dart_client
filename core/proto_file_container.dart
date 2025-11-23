@@ -4,6 +4,7 @@ import 'proto_types/service_type.dart';
 
 class ProtoFileContainer implements ProtoJsonSerializationInterface {
   final String fileName;
+  final String package;
   late Map<String, ProtoMessage>? messages;
   late List<String>? imports;
   late Map<String, ServiceType>?
@@ -11,6 +12,7 @@ class ProtoFileContainer implements ProtoJsonSerializationInterface {
 
   ProtoFileContainer({
     required this.fileName,
+    required this.package,
     this.messages,
     this.imports,
     this.services,

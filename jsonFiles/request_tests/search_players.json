@@ -1,0 +1,9 @@
+﻿{
+  "nameContains": "d",
+  "type": 2,
+  "minHealth": 10.0,
+  "maxHealth": 100.0,
+  "minLevel": 1,
+  "maxLevel": 50
+}
+

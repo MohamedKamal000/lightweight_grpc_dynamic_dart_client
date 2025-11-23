@@ -1,0 +1,22 @@
+﻿{
+  "playerId": 1,
+  "newName": "HamadaUpdated",
+  "newHealth": 87.5,
+  "updatedAttributes": {
+    "strength": 12,
+    "agility": 9
+  },
+  "newItems": [
+    {
+      "itemName": "Sword",
+      "quantity": 1,
+      "rarity": 3
+    },
+    {
+      "itemName": "Health Potion",
+      "quantity": 5,
+      "rarity": 1
+    }
+  ]
+}
+

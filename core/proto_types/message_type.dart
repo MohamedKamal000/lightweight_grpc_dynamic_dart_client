@@ -5,10 +5,12 @@ import 'proto_json_serialization_interface.dart';
 
 class ProtoMessage implements ProtoJsonSerializationInterface{
   final String messageName;
+  final bool isMapEntry;
   final List<ProtoField> fields;
 
   const ProtoMessage(this.messageName, {
     required this.fields,
+    this.isMapEntry = false,
   });
 
   void AddField(ProtoField field) {

@@ -35,3 +35,21 @@ how variants encoding works ?
 0000100 1110000
 11110000 00000100
 F0 04
+
+
+maps in proto bufs get translated to these
+repeated MapFieldEntry messageEntry;
+
+message MapFieldEntry {
+  key_type key = 1;
+  value_type value = 2;
+}
+
+and i write it as json like this:
+"mapFieldName": {
+    "key1": "value1",
+    "key2": "value2"
+}
+
+how can we write a messsage structure that faciliates the data mapping later ?
+
