@@ -1,34 +1,13 @@
-﻿/*
-
-  methodName
-   "GetPlayers" : {
-      "field" : "value"
-      // field may be a protoMessage sometime
-      "field" : {
-        "field" : "value"
-        ....
-      }
-   }
-
-
-   {
-   "service" : "PlayerService",
-   "method" : "GetPlayers",
-   "data" :{
-
-   }
-   }
-*/
-
-// i need a way to extract fields information from json and create protoMessage objects
-import 'proto_file_container.dart';
+﻿import 'proto_file_container.dart';
 import 'proto_types.dart';
+import 'proto_types/field_data.dart';
 import 'proto_types/field_type.dart';
+import 'proto_types/message_data.dart';
 import 'proto_types/message_type.dart';
 
 class DeserializeJsonToMessage {
   final dynamic data;
-  final ProtoMessage messageStructure;
+  final ProtoMessageDefinition messageStructure;
   final ProtoFileContainer container;
 
   DeserializeJsonToMessage({
@@ -37,8 +16,7 @@ class DeserializeJsonToMessage {
     required this.container,
   });
 
-  ProtoMessage GetMessageStructureByName(String typeName) {
-    // too lazy to make a map inside the protoMessage class :>
+  ProtoMessageDefinition GetMessageStructureByName(String typeName) {
     for (var field in messageStructure.fields) {
       if (field.typeName == typeName &&
           field.fieldType == ProtoType.TYPE_MESSAGE) {
@@ -48,8 +26,8 @@ class DeserializeJsonToMessage {
     throw Exception('Message structure for typeName $typeName not found.');
   }
 
-  ProtoMessage Deserialize() {
-    List<ProtoField> deserializedFields = [];
+  ProtoMessageData Deserialize() {
+    List<ProtoFieldData> deserializedFields = [];
 
     for (var field in messageStructure.fields) {
       if (data[field.fieldName] == null &&
@@ -62,10 +40,12 @@ class DeserializeJsonToMessage {
       if (data[field.fieldName] != null) {
         dynamic fieldValue = data[field.fieldName];
 
-        if (field.fieldType == ProtoType.TYPE_MESSAGE && field.typeName != null) {
-          ProtoMessage nestedMessageStructure = GetMessageStructureByName(field.typeName!,);
+        if (field.fieldType == ProtoType.TYPE_MESSAGE &&
+            field.typeName != null) {
+          ProtoMessageDefinition nestedMessageStructure =
+              GetMessageStructureByName(field.typeName!);
           if (nestedMessageStructure.isMapEntry) {
-            ProtoField mapField = HandleMapField(
+            ProtoFieldData mapField = HandleMapField(
               nestedMessageStructure,
               field,
               fieldValue,
@@ -75,7 +55,7 @@ class DeserializeJsonToMessage {
           }
 
           if (field.fieldLabel == ProtoLabel.LABEL_REPEATED) {
-            ProtoField repeatedField = HandleRepeatedField(
+            ProtoFieldData repeatedField = HandleRepeatedMessagesField(
               nestedMessageStructure,
               field,
               fieldValue,
@@ -87,63 +67,49 @@ class DeserializeJsonToMessage {
               messageStructure: nestedMessageStructure,
               container: container,
             );
-            ProtoMessage nestedMessage = deserializer.Deserialize();
+            ProtoMessageData nestedMessage = deserializer.Deserialize();
             deserializedFields.add(
-              ProtoField(
-                fieldNumber: field.fieldNumber,
-                fieldName: field.fieldName,
-                fieldType: field.fieldType,
-                fieldLabel: field.fieldLabel,
-                isDataSet: true,
+              ProtoFieldData(
+                fieldDefinition: ProtoFieldDefinition(
+                  fieldNumber: field.fieldNumber,
+                  fieldName: field.fieldName,
+                  fieldType: field.fieldType,
+                  fieldLabel: field.fieldLabel,
+                ),
                 data: nestedMessage,
               ),
             );
           }
         } else {
-          if (field.fieldLabel == ProtoLabel.LABEL_REPEATED) {
             deserializedFields.add(
-              ProtoField(
+              ProtoFieldData(fieldDefinition: ProtoFieldDefinition(
                 fieldNumber: field.fieldNumber,
                 fieldName: field.fieldName,
                 fieldType: field.fieldType,
                 fieldLabel: field.fieldLabel,
-                isDataSet: true,
-                listOfData_if_repeated: fieldValue,
-              ),
-            );
-          } else {
-            deserializedFields.add(
-              ProtoField(
-                fieldNumber: field.fieldNumber,
-                fieldName: field.fieldName,
-                fieldType: field.fieldType,
-                fieldLabel: field.fieldLabel,
-                isDataSet: true,
-                data: fieldValue,
-              ),
+              ),data: fieldValue),
             );
           }
         }
-      } else {
+      else {
         throw Exception(
           'Field ${field.fieldName} is not set in the provided data.',
         );
       }
     }
 
-    return ProtoMessage(
-      messageStructure.messageName,
-      fields: deserializedFields,
+    return ProtoMessageData(
+      messageDefinition: messageStructure,
+      fieldsData: deserializedFields,
     );
   }
 
-
-  ProtoField HandleMapField(
-    ProtoMessage nestedMessageStructure,
-    ProtoField field,
+  ProtoFieldData HandleMapField(
+    ProtoMessageDefinition nestedMessageStructure,
+    ProtoFieldDefinition field,
     dynamic fieldValue,
   ) {
-    List<ProtoMessage> mapEntryMessages = [];
+    List<ProtoMessageData> mapEntryMessages = [];
     for (final mapEntry in fieldValue.entries) {
       DeserializeJsonToMessage keyValueDeserializer = DeserializeJsonToMessage(
         data: {
@@ -153,42 +119,43 @@ class DeserializeJsonToMessage {
         messageStructure: nestedMessageStructure,
         container: container,
       );
-      ProtoMessage mapEntryMessage = keyValueDeserializer.Deserialize();
+      ProtoMessageData mapEntryMessage = keyValueDeserializer.Deserialize();
       mapEntryMessages.add(mapEntryMessage);
     }
-    return ProtoField(
-      fieldNumber: field.fieldNumber,
-      fieldName: field.fieldName,
-      fieldType: field.fieldType,
-      fieldLabel: field.fieldLabel,
-      isDataSet: true,
-      listOfData_if_repeated: mapEntryMessages,
+    return ProtoFieldData(
+      fieldDefinition: ProtoFieldDefinition(
+        fieldNumber: field.fieldNumber,
+        fieldName: field.fieldName,
+        fieldType: field.fieldType,
+        fieldLabel: field.fieldLabel,
+      ),
+      data: mapEntryMessages,
     );
   }
 
-
-  ProtoField HandleRepeatedField(
-    ProtoMessage nestedMessageStructure,
-    ProtoField field,
+  ProtoFieldData HandleRepeatedMessagesField(
+    ProtoMessageDefinition nestedMessageStructure,
+    ProtoFieldDefinition field,
     dynamic fieldValue,
   ) {
-    List<ProtoMessage> repeatedMessages = [];
+    List<ProtoMessageData> repeatedMessages = [];
     for (final item in fieldValue) {
       DeserializeJsonToMessage itemDeserializer = DeserializeJsonToMessage(
         data: item,
         messageStructure: nestedMessageStructure,
         container: container,
       );
-      ProtoMessage itemMessage = itemDeserializer.Deserialize();
+      ProtoMessageData itemMessage = itemDeserializer.Deserialize();
       repeatedMessages.add(itemMessage);
     }
-    return ProtoField(
-      fieldNumber: field.fieldNumber,
-      fieldName: field.fieldName,
-      fieldType: field.fieldType,
-      fieldLabel: field.fieldLabel,
-      isDataSet: true,
-      listOfData_if_repeated: repeatedMessages,
+    return ProtoFieldData(
+      fieldDefinition: ProtoFieldDefinition(
+        fieldNumber: field.fieldNumber,
+        fieldName: field.fieldName,
+        fieldType: field.fieldType,
+        fieldLabel: field.fieldLabel,
+      ),
+      data: repeatedMessages,
     );
   }
 }

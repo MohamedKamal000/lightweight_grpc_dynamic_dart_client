@@ -20,13 +20,13 @@ class ProtoEncoderAlgorithmMatcher {
         WireTypeInfo(wire_type: Wire_Type.I32,specificType: ProtoType.TYPE_FIXED32): FloatEncoder(),
         WireTypeInfo(wire_type: Wire_Type.I32,specificType: ProtoType.TYPE_SFIXED32): FloatEncoder(),
         WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_INT32): IntEncoder(),
-        WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_INT64): IntEncoder(),
+        WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_INT64): BigIntEncoder(),
         WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_BOOL): IntEncoder(),
         WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_ENUM): IntEncoder(),
         WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_UINT32): IntEncoder(),
         WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_UINT64): IntEncoder(),
-        WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_SINT32): SIntEncoder(),
-        WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_SINT64): SIntEncoder(),
+        WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_SINT32): SInt32Encoder(),
+        WireTypeInfo(wire_type: Wire_Type.VARINT,specificType: ProtoType.TYPE_SINT64): SInt64Encoder(),
         WireTypeInfo(wire_type: Wire_Type.LEN,specificType: ProtoType.TYPE_BYTES): BytesEncoder(),
         WireTypeInfo(wire_type: Wire_Type.LEN,specificType: ProtoType.TYPE_STRING): StringEncoder(),
       };
@@ -68,12 +68,20 @@ class StringEncoder implements ProtoEncoderAlgorithm<String> {
 class IntEncoder implements ProtoEncoderAlgorithm<int> {
   @override
   String Encode(int value,ProtoEncoder encoder) {
-    String binaryRepresentation = ConvertDecimalToBinary(value);
+    String binaryRepresentation = value < 0 ? ConvertDecimalToTwosComplement32(value): ConvertDecimalToBinary(value);
     return encoder.encodeVariant(binaryRepresentation);
   }
 }
 
-class SIntEncoder implements ProtoEncoderAlgorithm<int> {
+class BigIntEncoder implements ProtoEncoderAlgorithm<int> {
+  @override
+  String Encode(int value,ProtoEncoder encoder) {
+    String binaryRepresentation = value < 0 ? ConvertDecimalToTwosComplement64(value): ConvertDecimalToBinary64(BigInt.from(value));
+    return encoder.encodeVariant(binaryRepresentation);
+  }
+}
+
+class SInt32Encoder implements ProtoEncoderAlgorithm<int> {
   @override
   String Encode(int value,ProtoEncoder encoder) {
     int zigzagValue = EncodeZigZag32(value);
@@ -81,6 +89,16 @@ class SIntEncoder implements ProtoEncoderAlgorithm<int> {
     return encoder.encodeVariant(binaryRepresentation);
   }
 }
+
+class SInt64Encoder implements ProtoEncoderAlgorithm<int> {
+  @override
+  String Encode(int value,ProtoEncoder encoder) {
+    BigInt zigzagValue = EncodeZigZag64(value);
+    String binaryRepresentation = ConvertDecimalToBinary64(zigzagValue);
+    return encoder.encodeVariant(binaryRepresentation);
+  }
+}
+
 
 class BytesEncoder implements ProtoEncoderAlgorithm<List<int>> {
   @override

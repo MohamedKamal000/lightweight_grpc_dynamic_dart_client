@@ -3,17 +3,17 @@
 import 'field_type.dart';
 import 'proto_json_serialization_interface.dart';
 
-class ProtoMessage implements ProtoJsonSerializationInterface{
+class ProtoMessageDefinition implements ProtoJsonSerializationInterface{
   final String messageName;
   final bool isMapEntry;
-  final List<ProtoField> fields;
+  final List<ProtoFieldDefinition> fields;
 
-  const ProtoMessage(this.messageName, {
+  const ProtoMessageDefinition(this.messageName, {
     required this.fields,
     this.isMapEntry = false,
   });
 
-  void AddField(ProtoField field) {
+  void AddField(ProtoFieldDefinition field) {
     fields.add(field);
   }
 
@@ -31,15 +31,4 @@ class ProtoMessage implements ProtoJsonSerializationInterface{
     };
   }
 
-  String EncodeMessage(){
-    StringBuffer buffer = StringBuffer();
-    for (var field in fields) {
-
-      if (!field.isDataSet)
-        continue;
-
-      buffer.write(field.EncodeData());
-    }
-    return buffer.toString();
-  }
 }

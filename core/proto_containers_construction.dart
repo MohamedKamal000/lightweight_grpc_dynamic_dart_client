@@ -8,6 +8,7 @@ import 'proto_types/service_type.dart';
 
 Map<String,ProtoFileContainer> ConstructProtoFileContainers(List<FileDescriptorProto> fileDescriptors) {
   Map<String,ProtoFileContainer> containers = {};
+
   for (final file in fileDescriptors) {
     containers[file.package] = ConstructProtoFileContainer(file);
   }
@@ -16,6 +17,7 @@ Map<String,ProtoFileContainer> ConstructProtoFileContainers(List<FileDescriptorP
 }
 
 ProtoFileContainer ConstructProtoFileContainer(FileDescriptorProto fileDescriptor) {
+
   final messagesMap = ConstructMessages(fileDescriptor.messageType, {}, fileDescriptor.package.isEmpty ? '' : fileDescriptor.package);
   final services = ConstructServices(fileDescriptor.service, fileDescriptor.package.isEmpty ? '' : fileDescriptor.package);
   ProtoFileContainer container = ProtoFileContainer(
@@ -31,19 +33,19 @@ ProtoFileContainer ConstructProtoFileContainer(FileDescriptorProto fileDescripto
   return container;
 }
 
-List<ServiceType> ConstructServices(
+List<ProtoServiceDefinition> ConstructServices(
   List<ServiceDescriptorProto> serviceDescriptors,
   String packageName,
 ) {
-  List<ServiceType> services = [];
+  List<ProtoServiceDefinition> services = [];
   for (final service in serviceDescriptors) {
     final serviceName = packageName.isNotEmpty
         ? '$packageName.${service.name}'
         : service.name;
 
-    final serviceType = ServiceType(name: serviceName, methods: {});
+    final serviceType = ProtoServiceDefinition(name: serviceName, methods: {});
     for (final method in service.method) {
-      serviceType.methods[method.name] = MethodType(
+      serviceType.methods[method.name] = ProtoMethodDefinition(
         methodName: method.name,
         inputType: method.inputType.replaceFirst('.', ''),
         outputType: method.outputType.replaceFirst('.', ''),
@@ -56,22 +58,21 @@ List<ServiceType> ConstructServices(
   return services;
 }
 
-Map<String, ProtoMessage> ConstructMessages(
+Map<String, ProtoMessageDefinition> ConstructMessages(
   List<DescriptorProto> messageDescriptors,
-  Map<String, ProtoMessage> messageMap,
+  Map<String, ProtoMessageDefinition> messageMap,
     String prefixDefinition ,
 ) {
 
   for (final msg in messageDescriptors) {
     final messageName = prefixDefinition.isNotEmpty ? '$prefixDefinition.${msg.name}' : msg.name;
-    final protoMessage = ProtoMessage(messageName, fields: [],isMapEntry: msg.options.mapEntry);
+    final protoMessage = ProtoMessageDefinition(messageName, fields: [],isMapEntry: msg.options.mapEntry);
     for (final field in msg.field) {
       final fieldType = ProtoType.fromValue_toProtoType(field.type.value);
-      final protoField = ProtoField(
+      final protoField = ProtoFieldDefinition(
         fieldNumber: field.number,
         fieldName: field.name,
         fieldType: fieldType,
-        isDataSet: false,
         fieldLabel: ProtoLabel.fromValue(field.label.toString()),
         typeName: field.typeName.isNotEmpty ? field.typeName : null,
       );

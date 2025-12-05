@@ -1,6 +1,6 @@
 ﻿import 'proto_json_serialization_interface.dart';
 
-class MethodType implements ProtoJsonSerializationInterface {
+class ProtoMethodDefinition implements ProtoJsonSerializationInterface {
   final String methodName;
   final String inputType;
   final String outputType;
@@ -8,7 +8,7 @@ class MethodType implements ProtoJsonSerializationInterface {
   final bool serverStreaming = false;
 
 
-  MethodType({
+  ProtoMethodDefinition({
     required this.methodName,
     required this.inputType,
     required this.outputType,

@@ -12,8 +12,59 @@ String ConvertDecimalToBinary(int decimalNumber) {
   return binary;
 }
 
+
+String ConvertDecimalToBinary64(BigInt decimalNumber) {
+  String binary = BigInt.parse(decimalNumber.toString(),radix: 10).toRadixString(2);
+  return binary;
+}
+
+String ConvertDecimalToTwosComplement32(int n) {
+  String binary = ConvertDecimalToBinary(n.abs());
+  binary = binary.padLeft(32, '0');
+
+  List<String> result = binary.split('');
+  for (int i = 0; i < result.length; i++) {
+    if (result[i] == '0') {
+      result[i] = '1';
+    } else {
+      result[i] = '0';
+    }
+  }
+  String invertedBinary = result.join('');
+  int invertedDecimal = ConvertBinaryToDecimal(invertedBinary);
+  int twosComplementDecimal = invertedDecimal + 1;
+  String twosComplementBinary = ConvertDecimalToBinary(twosComplementDecimal);
+  twosComplementBinary = twosComplementBinary.padLeft(32, '0');
+  return twosComplementBinary;
+}
+
+String ConvertDecimalToTwosComplement64(int n) {
+  String binary = ConvertDecimalToBinary(n.abs());
+  binary = binary.padLeft(64, '0');
+
+  List<String> result = binary.split('');
+  for (int i = 0; i < result.length; i++) {
+    if (result[i] == '0') {
+      result[i] = '1';
+    } else {
+      result[i] = '0';
+    }
+  }
+  String invertedBinary = result.join('');
+  BigInt invertedDecimal = ConvertBinaryToDecimal64(invertedBinary);
+  BigInt twosComplementDecimal = invertedDecimal + BigInt.one;
+  String twosComplementBinary = ConvertDecimalToBinary64(twosComplementDecimal);
+  twosComplementBinary = twosComplementBinary.padLeft(64, '0');
+  return twosComplementBinary;
+}
+
 int ConvertBinaryToDecimal(String binaryString) {
   int decimalNumber = int.parse(binaryString,radix: 2);
+  return decimalNumber;
+}
+
+BigInt ConvertBinaryToDecimal64(String binaryString) {
+  BigInt decimalNumber = BigInt.parse(binaryString,radix: 2);
   return decimalNumber;
 }
 
@@ -84,6 +135,12 @@ List<int> encodeFloat64(double value) {
 int EncodeZigZag32(int n) {
   return (n << 1) ^ (n >> 31);
 }
+
+BigInt EncodeZigZag64(int n) {
+  final bigIntN = BigInt.from(n);
+  return (bigIntN << 1) ^ (bigIntN >> 63);
+}
+
 
 int DecodeZigZag32(int n) {
   return (n >> 1) ^ -(n & 1);

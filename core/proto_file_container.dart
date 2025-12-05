@@ -5,9 +5,10 @@ import 'proto_types/service_type.dart';
 class ProtoFileContainer implements ProtoJsonSerializationInterface {
   final String fileName;
   final String package;
-  late Map<String, ProtoMessage>? messages;
+  late Map<String, ProtoMessageDefinition>? messages;
   late List<String>? imports;
-  late Map<String, ServiceType>?
+  late Map<String, ProtoFileContainer> importedContainers = {};
+  late Map<String, ProtoServiceDefinition>?
   services; // we need services too here (will act as a way to lookup services a server expose)
 
   ProtoFileContainer({
@@ -18,11 +19,11 @@ class ProtoFileContainer implements ProtoJsonSerializationInterface {
     this.services,
   });
 
-  void SetMessages(Map<String, ProtoMessage> msgs) {
+  void SetMessages(Map<String, ProtoMessageDefinition> msgs) {
     messages = msgs;
   }
 
-  void SetServices(Map<String, ServiceType> services) {
+  void SetServices(Map<String, ProtoServiceDefinition> services) {
     this.services = services;
   }
 

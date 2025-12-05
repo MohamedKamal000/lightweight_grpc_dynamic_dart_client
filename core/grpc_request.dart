@@ -1,12 +1,13 @@
 ﻿import 'deserialize_json_to_message.dart';
 import 'proto_file_container.dart';
+import 'proto_types/message_data.dart';
 import 'proto_types/message_type.dart';
 import 'proto_types/method_type.dart';
 
 class GrpcRequest {
   final String service;
   final String method;
-  final ProtoMessage message;
+  final ProtoMessageData message;
 
   GrpcRequest({
     required this.service,
@@ -24,12 +25,12 @@ class GrpcRequest {
       throw Exception('Method not found in service $service');
     }
 
-    MethodType methodType = protoFileContainer.services![service]!.methods[methodName]!;
+    ProtoMethodDefinition methodType = protoFileContainer.services![service]!.methods[methodName]!;
     String inputTypeName = methodType.inputType; // message as Input type
 
     dynamic dataSent = json['data']; // incoming data
 
-    ProtoMessage messageStructure =
+    ProtoMessageDefinition messageStructure =
         protoFileContainer.messages![inputTypeName]!;
 
     DeserializeJsonToMessage deserializer = DeserializeJsonToMessage(

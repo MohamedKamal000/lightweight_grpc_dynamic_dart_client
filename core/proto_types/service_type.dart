@@ -4,11 +4,11 @@
 import 'method_type.dart';
 import 'proto_json_serialization_interface.dart';
 
-class ServiceType implements ProtoJsonSerializationInterface {
+class ProtoServiceDefinition implements ProtoJsonSerializationInterface {
   final String name;
-  final Map<String,MethodType> methods;
+  final Map<String,ProtoMethodDefinition> methods;
 
-  ServiceType({
+  ProtoServiceDefinition({
     required this.name,
     required this.methods,
   });

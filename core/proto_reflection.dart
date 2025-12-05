@@ -1,9 +1,4 @@
-﻿
-
-
-
-
-import '../proto_descriptor/descriptor.pb.dart';
+﻿import '../proto_descriptor/descriptor.pb.dart';
 import '../reflection_client.dart';
 import 'proto_containers_construction.dart';
 import 'proto_file_container.dart';
@@ -33,7 +28,7 @@ class ProtoReflection{
     return container!;
   }
 
-  Future<Set<String>> _RequestAvailableServicesViaReflection() async {
+  Future<Set<String>> RequestAvailableServicesViaReflection() async {
     final reflection = ReflectionClient('localhost', 50051);
     final services = await reflection.listServices();
     Set<String> serviceNames = {};
@@ -56,7 +51,7 @@ class ProtoReflection{
   /// Full name of a registered service, including its package name.
   /// The format is package.service
   Future<bool> SearchForService(String serviceName) async{
-    Set<String> servicesSet = await this._RequestAvailableServicesViaReflection();
+    Set<String> servicesSet = await this.RequestAvailableServicesViaReflection();
     return servicesSet.contains(serviceName);
   }
 
