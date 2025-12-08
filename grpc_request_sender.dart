@@ -13,25 +13,26 @@ class DynamicGrpcClient {
       (List<int> value) => value,
       (List<int> value) => value,
     );
+    
+    
 
     final client = Client(clientChannel, options: CallOptions());
     final response = await client.$createUnaryCall<List<int>, List<int>>(
       method,
       requestBytes,
     );
-
     return response;
   }
 
   Future MakeCall(GrpcRequest request) async{
     String encodedMessage = request.message.EncodeMessage();
-    var binaryString = ConvertHexadecimalToBytes(encodedMessage);
+    List<int> bytesList = ConvertHexadecimalToBytes(encodedMessage);
     print('Encoded Request Data (Hex): $encodedMessage'); // debugging
 
     var result = await this._CallMethod(
       request.service,
       request.method,
-      binaryString,
+      bytesList,
     );
 
 

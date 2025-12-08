@@ -10,3 +10,24 @@ Some Refactors and things to do:
  [] dealing with multiple proto files imports, where there might be some type in a different file u might retrieve (next)
  [] handle metadata sending
  [] support streaming
+
+
+what is made so far:
+ protobuff encoding
+ organizing the FileDescriptor data in a manner that can help us later to map input data
+ reflection and file importing
+ sending requests
+ serializing json input to a proto message
+ deserializing message to json (work for message definition only but will need to refactor it once we implement decoding)
+
+what need to be done:
+ proto buff decoding
+ raising errors for certain cases (will probably integrate it also with the app terminal window once we integrate every thing)
+ dealing with proto dependencies (i already made it but need more testing)
+ handle metadata sending
+ support streaming
+
+
+
+
+

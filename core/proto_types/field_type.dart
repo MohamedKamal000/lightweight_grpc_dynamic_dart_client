@@ -1,7 +1,7 @@
 ﻿import '../proto_types.dart';
 import 'proto_json_serialization_interface.dart';
 
-class ProtoFieldDefinition implements ProtoJsonSerializationInterface{
+class ProtoFieldDefinition implements ProtoJsonDeserializationInterface{
   final int fieldNumber;
   final String fieldName;
   final ProtoType fieldType;
@@ -28,6 +28,7 @@ class ProtoFieldDefinition implements ProtoJsonSerializationInterface{
   @override
   Map<String,dynamic> toJson() {
     return {
+      'fieldNumber' : fieldNumber,
       'fieldName': fieldName,
       'fieldType': fieldType.toString(),
       'fieldLabel': fieldLabel.toString(),

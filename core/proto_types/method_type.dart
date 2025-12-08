@@ -1,6 +1,6 @@
 ﻿import 'proto_json_serialization_interface.dart';
 
-class ProtoMethodDefinition implements ProtoJsonSerializationInterface {
+class ProtoMethodDefinition implements ProtoJsonDeserializationInterface {
   final String methodName;
   final String inputType;
   final String outputType;

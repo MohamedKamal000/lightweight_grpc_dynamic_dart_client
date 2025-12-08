@@ -1,4 +1,4 @@
-﻿import 'deserialize_json_to_message.dart';
+﻿import 'serializing_json_to_message.dart';
 import 'proto_file_container.dart';
 import 'proto_types/message_data.dart';
 import 'proto_types/message_type.dart';
@@ -31,9 +31,9 @@ class GrpcRequest {
     dynamic dataSent = json['data']; // incoming data
 
     ProtoMessageDefinition messageStructure =
-        protoFileContainer.messages![inputTypeName]!;
+        protoFileContainer.GetMessageDefinition(inputTypeName);
 
-    DeserializeJsonToMessage deserializer = DeserializeJsonToMessage(
+    SerializingJsonToMessage deserializer = SerializingJsonToMessage(
       data: dataSent,
       messageStructure: messageStructure,
       container: protoFileContainer,
@@ -41,7 +41,7 @@ class GrpcRequest {
     return GrpcRequest(
       service: service,
       method: methodName,
-      message: deserializer.Deserialize()
+      message: deserializer.Serialize()
     );
   }
 }

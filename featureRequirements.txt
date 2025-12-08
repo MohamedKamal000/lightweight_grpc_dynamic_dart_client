@@ -1,0 +1,73 @@
+﻿
+
+
+what do we excpect from a feature requirements document?
+
+
+feature key points and how to implement them:
+[] parsing proto files:
+    use google descriptor.proto file to generate what is called FileDescriptor dart class which is a way of
+    parsing a proto file
+[] reflection:
+    use the google reflection.proto file to generate a reflection class that enables us to do the following:
+    list available services
+    search for a specific file by name
+    search for a file which contains a specific services "fileContainingSymbol"
+    Note: the generated reflection class relies on the grpc dart package
+
+[] importing files:
+    will rely on protoc compiler which is basically a .exe file with different versions for different os that we can run based
+    on the running os with specific arguments to generate a FileDescriptorSet that contains the
+    FileDescriptor of each proto file
+
+[] Sending requests:
+    will parse the user json input and map it to the method message defintion he tries to invoke
+    and then encode the input in the same way specified in the protobuff documentation (will find it at references)
+    will also decode the response in the same way mentioned in the protobuff documentation and map it to the method
+    message return type definition
+
+[] Streaming:
+    the google descriptor file has 2 fields that can help us at the parsing step to decide if a
+    method has client streaming or server streaming or both set to true
+    and the grpc package itself can do streaming through createStreamingCall method
+
+
+feature requirements and good use case scenarios:
+1- writing the server with the ":" at the end to specify the port number, if not specified use default which is 443 and 80 if TLS is not enabled.
+   (also has the option to choose to use TLS or not)
+
+2- user have the option to either check for services via reflection or by importing .proto file
+   Note: will need to maintain or have access to the imported .proto files by the main file in either way
+
+3- the user choose the services he want to invoke, (unary call, client streaming, server streaming, bidirectional streaming)
+    among all the services available
+
+4- the user will write the request in the form of json (we can have an option that shows the user an example of the request)
+    Note: any extra not known fields will be dropped, wrong field type will raise an error
+
+5- based on the type of the call the user choose, we will show the request sent and the response in a different way
+    for unary call, we will show the request and response once
+    for client streaming, we will show the different requests sent and the response once
+    for server streaming, we will show the request once and the different responses received
+    for bidirectional streaming, we will show the different requests sent and the different responses received
+
+
+
+bad use case scenarios and how to handle them:
+1- user specify a wrong server address or port number
+   - log the error in the terminal saying the server is unreachable
+
+2- server has no reflection service enabled and user choose to check via reflection
+   - log the error in the terminal saying reflection service is not enabled on the server
+
+3- user import a .proto file that is not compatible with the server
+   - send the request and show the error received from the server ( which in this case will be 12 UNIMPLEMENTED )
+
+4- user writes a bad request form (missing required fields, wrong field types, extra fields)
+    - log the error in the terminal specifying the issue with the request form
+
+
+
+
+
+

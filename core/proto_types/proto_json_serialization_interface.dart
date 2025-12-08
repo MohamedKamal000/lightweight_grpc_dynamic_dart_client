@@ -2,6 +2,6 @@
 
 
 
-abstract interface class ProtoJsonSerializationInterface {
+abstract interface class ProtoJsonDeserializationInterface {
   Map<String,dynamic> toJson();
 }

@@ -1,32 +1,35 @@
-﻿import 'package:grpc/grpc.dart';
+﻿import 'dart:async';
+import 'package:grpc/grpc.dart';
 import 'proto_generated/reflection.pbgrpc.dart';
 
-
 class ReflectionClient {
-  // final ClientChannel _channel;
   final String _host;
-  final int _port;
+  late int _port = 443;
   late ServerReflectionClient _stub;
   late ClientChannel clientChannel;
-  late ChannelOptions _options = ChannelOptions(credentials: ChannelCredentials.insecure());
 
-  ReflectionClient(this._host, this._port) {
+  ReflectionClient(this._host, this._port, {bool isSecure = false}) {
+    print(_port == 443 ? 'Using secure channel' : 'Using insecure channel');
     clientChannel = ClientChannel(
       _host,
       port: _port,
-      options: _options,
+      options: ChannelOptions(
+          credentials: isSecure ? ChannelCredentials.secure() : ChannelCredentials.insecure()
+      )
     );
     _stub = ServerReflectionClient(clientChannel);
   }
 
-  Future<ServerReflectionResponse> listServices() async {
+  Stream<ServerReflectionResponse> listServices() {
+    print('Requesting list of services from $_host:$_port');
+
     final responseStream = _stub.serverReflectionInfo(
       Stream.fromIterable([
         ServerReflectionRequest(listServices: '')
       ]),
     );
 
-    return await responseStream.single;
+    return responseStream;
   }
 
   Stream<ServerReflectionResponse> getServiceStream(String serviceName) {
@@ -39,7 +42,15 @@ class ReflectionClient {
     return responseStream;
   }
 
+  Future<ServerReflectionResponse> getFileByNameStream(String fileName) async{
+    final responseStream = _stub.serverReflectionInfo(
+      Stream.fromIterable([
+        ServerReflectionRequest(fileByFilename: fileName)
+      ]),
+    );
 
+    return await responseStream.single;
+  }
 
   Future<void> close() async {
     await clientChannel.shutdown();

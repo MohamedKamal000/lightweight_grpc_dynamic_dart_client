@@ -3,7 +3,7 @@
 import 'field_type.dart';
 import 'proto_json_serialization_interface.dart';
 
-class ProtoMessageDefinition implements ProtoJsonSerializationInterface{
+class ProtoMessageDefinition implements ProtoJsonDeserializationInterface{
   final String messageName;
   final bool isMapEntry;
   final List<ProtoFieldDefinition> fields;

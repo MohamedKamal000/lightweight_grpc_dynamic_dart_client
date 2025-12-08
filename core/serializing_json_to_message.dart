@@ -5,12 +5,12 @@ import 'proto_types/field_type.dart';
 import 'proto_types/message_data.dart';
 import 'proto_types/message_type.dart';
 
-class DeserializeJsonToMessage {
+class SerializingJsonToMessage {
   final dynamic data;
   final ProtoMessageDefinition messageStructure;
   final ProtoFileContainer container;
 
-  DeserializeJsonToMessage({
+  SerializingJsonToMessage({
     required this.data,
     required this.messageStructure,
     required this.container,
@@ -20,14 +20,15 @@ class DeserializeJsonToMessage {
     for (var field in messageStructure.fields) {
       if (field.typeName == typeName &&
           field.fieldType == ProtoType.TYPE_MESSAGE) {
-        return container.messages![typeName.replaceFirst('.', '')]!;
+        String messageName = typeName.replaceFirst('.', '');
+        return container.GetMessageDefinition(messageName);
       }
     }
     throw Exception('Message structure for typeName $typeName not found.');
   }
 
-  ProtoMessageData Deserialize() {
-    List<ProtoFieldData> deserializedFields = [];
+  ProtoMessageData Serialize() {
+    List<ProtoFieldData> serializedFields = [];
 
     for (var field in messageStructure.fields) {
       if (data[field.fieldName] == null &&
@@ -50,7 +51,7 @@ class DeserializeJsonToMessage {
               field,
               fieldValue,
             );
-            deserializedFields.add(mapField);
+            serializedFields.add(mapField);
             continue;
           }
 
@@ -60,15 +61,15 @@ class DeserializeJsonToMessage {
               field,
               fieldValue,
             );
-            deserializedFields.add(repeatedField);
+            serializedFields.add(repeatedField);
           } else {
-            DeserializeJsonToMessage deserializer = DeserializeJsonToMessage(
+            SerializingJsonToMessage serializer = SerializingJsonToMessage(
               data: fieldValue,
               messageStructure: nestedMessageStructure,
               container: container,
             );
-            ProtoMessageData nestedMessage = deserializer.Deserialize();
-            deserializedFields.add(
+            ProtoMessageData nestedMessage = serializer.Serialize();
+            serializedFields.add(
               ProtoFieldData(
                 fieldDefinition: ProtoFieldDefinition(
                   fieldNumber: field.fieldNumber,
@@ -81,7 +82,7 @@ class DeserializeJsonToMessage {
             );
           }
         } else {
-            deserializedFields.add(
+            serializedFields.add(
               ProtoFieldData(fieldDefinition: ProtoFieldDefinition(
                 fieldNumber: field.fieldNumber,
                 fieldName: field.fieldName,
@@ -100,7 +101,7 @@ class DeserializeJsonToMessage {
 
     return ProtoMessageData(
       messageDefinition: messageStructure,
-      fieldsData: deserializedFields,
+      fieldsData: serializedFields,
     );
   }
 
@@ -111,7 +112,7 @@ class DeserializeJsonToMessage {
   ) {
     List<ProtoMessageData> mapEntryMessages = [];
     for (final mapEntry in fieldValue.entries) {
-      DeserializeJsonToMessage keyValueDeserializer = DeserializeJsonToMessage(
+      SerializingJsonToMessage keyValueSerializer = SerializingJsonToMessage(
         data: {
           nestedMessageStructure.fields[0].fieldName: mapEntry.key,
           nestedMessageStructure.fields[1].fieldName: mapEntry.value,
@@ -119,7 +120,7 @@ class DeserializeJsonToMessage {
         messageStructure: nestedMessageStructure,
         container: container,
       );
-      ProtoMessageData mapEntryMessage = keyValueDeserializer.Deserialize();
+      ProtoMessageData mapEntryMessage = keyValueSerializer.Serialize();
       mapEntryMessages.add(mapEntryMessage);
     }
     return ProtoFieldData(
@@ -140,12 +141,12 @@ class DeserializeJsonToMessage {
   ) {
     List<ProtoMessageData> repeatedMessages = [];
     for (final item in fieldValue) {
-      DeserializeJsonToMessage itemDeserializer = DeserializeJsonToMessage(
+      SerializingJsonToMessage itemSerializer = SerializingJsonToMessage(
         data: item,
         messageStructure: nestedMessageStructure,
         container: container,
       );
-      ProtoMessageData itemMessage = itemDeserializer.Deserialize();
+      ProtoMessageData itemMessage = itemSerializer.Serialize();
       repeatedMessages.add(itemMessage);
     }
     return ProtoFieldData(

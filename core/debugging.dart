@@ -50,12 +50,12 @@ Future MethodCall(ProtoFileContainer protoFileContainer,String serviceToRequest,
 void FullMethodsTest(ProtoFileContainer container,String serviceName) async {
   String basePath = 'jsonFiles/request_tests';
   List<List<String>> methods = [
-    // ["CreatePlayer",'$basePath/create_player.json'],
-    // ["GetPlayer", '$basePath/get_player.json'],
-    // ["UpdatePlayer", '$basePath/update_player.json'],
-    // ["DeletePlayer", '$basePath/delete_player.json'],
-    // ["GetPlayers", '$basePath/get_players.json'],
-    // ['SearchPlayers', '$basePath/search_players.json'],
+    ["CreatePlayer",'$basePath/create_player.json'],
+    ["GetPlayer", '$basePath/get_player.json'],
+    ["UpdatePlayer", '$basePath/update_player.json'],
+    ["DeletePlayer", '$basePath/delete_player.json'],
+    ["GetPlayers", '$basePath/get_players.json'],
+    ['SearchPlayers', '$basePath/search_players.json'],
     ['TestNegativeValues', '$basePath/test_negative_values.json']
   ];
 
@@ -64,5 +64,5 @@ void FullMethodsTest(ProtoFileContainer container,String serviceName) async {
     await MethodCall(container, serviceName, method[0], method[1]);
     print('--- Finished Method: ${method[0]} ---\n');
   }
-
 }
+

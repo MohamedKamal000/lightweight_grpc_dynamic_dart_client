@@ -1,31 +1,40 @@
-﻿import 'core/ProtoImporting/protoc_run_script.dart';
-import 'core/debugging.dart';
+﻿import 'core/debugging.dart';
+import 'core/grpc_request.dart';
+import 'core/proto_containers_construction.dart';
 import 'core/proto_file_container.dart';
-import 'core/proto_reflection.dart';
+import 'core/proto_file_containers_importer.dart';
+import 'core/protoc_script_running/protoc_run_script.dart';
+import 'reflection_client.dart';
 
-
-Future Test() async{
-  ProtoReflection reflection = ProtoReflection();
+Future Test() async {
+  ProtoFileContainersImporting reflection = ProtoFileContainersImporting();
   String serviceToRequest = 'GameServerDefinition.GamePlayerManager';
-  final services = await reflection.RequestAvailableServicesViaReflection();
-  print('Available services: ${services.join(',').toString()}');
-  if (! (await reflection.SearchForService(serviceToRequest))) {
-  throw Exception('Service $serviceToRequest not found among available services.');
-  }
-  ProtoFileContainer protoFileContainer = await reflection.RequestFileDefinitionViaReflection(serviceToRequest);
-  print(protoFileContainer.toString());
-  // FullMethodsTest(protoFileContainer, serviceToRequest);
+  ProtoFileContainer protoFileContainer =
+      await reflection.RequestFileDefinitionViaFileImporting(
+        serviceToRequest,
+        './protos/game_server_definition.proto',
+      );
+  FullMethodsTest(protoFileContainer, serviceToRequest);
 }
 
 Future main(List<String> args) async {
-  await Test();
-  /*final set = await compileProtoAtRuntime('./protos/game_server_definition.proto', './protos/importedProtoFile.pb');
+  // await Test();
+/*
+  ProtoFileContainersImporting protoFileContainersImporting = ProtoFileContainersImporting();
+  final services = await protoFileContainersImporting.RequestAvailableServicesViaReflection('grpcb.in', serverPort: 9001,isSecure: true);
+  for (var service in services) {
+    print('Available service: $service');*/
 
-  for (var fileProto in set.file) {
-    print('File: ${fileProto.name}');
-    print('Messages: ${fileProto.messageType.map((m) => m.name)}');
-    print('Services: ${fileProto.service.map((s) => s.name)}');
-  }*/
+  ProtoFileContainersImporting importer = ProtoFileContainersImporting();
+  ProtoFileContainer container = await importer.RequestFileDefinitionViaFileImporting(
+    'GameServerDefinition.GamePlayerManager',
+    './protos/game_server_definition.proto');
+  // print(container.toJson());
+  final grpcR = GrpcRequest.fromJson({"data" : {
+    "name": {"1" : 50, "2" : 51, "3" : 52},
+    "type": 1
+  }}, container, 'GameServerDefinition.GamePlayerManager', 'CreatePlayer');
 
 
+  print(grpcR.message.EncodeMessage());
 }

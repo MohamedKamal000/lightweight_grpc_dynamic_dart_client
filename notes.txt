@@ -61,3 +61,6 @@ how can we write a messsage structure that faciliates the data mapping later ?
 
 00000001
 11111110
+./grpcurl.exe -insecure grpc.postman-echo.com:443 list
+
+openssl s_client -connect grpc.postman-echo.com:443 -alpn h2

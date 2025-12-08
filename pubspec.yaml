@@ -9,7 +9,7 @@ dependencies:
   async: any
   convert: ^3.1.2
   dart_oncrpc: ^1.0.1
-  grpc: ^4.3.1
+  grpc: ^5.0.0
   protobuf: ^5.0.0
 
 dev_dependencies:
